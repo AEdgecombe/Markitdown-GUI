@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "markitdown-gui"
+version = "0.1.0"
+description = "A simple Ubuntu/GNOME desktop GUI for Microsoft's markitdown document-to-Markdown converter."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Alexander Edgecombe", email = "alexander.edgecombe01@gmail.com" }]
+keywords = ["markdown", "markitdown", "converter", "gui", "tkinter", "document", "pdf", "office"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business",
+    "Topic :: Text Processing :: Markup :: Markdown",
+]
+
+dependencies = [
+    # The conversion engine. markitdown[all] enables every supported format.
+    "markitdown[all]>=0.0.1a2",
+]
+
+[project.optional-dependencies]
+# Drag-and-drop. Optional: the app falls back to the file picker without it.
+dnd = ["tkinterdnd2>=0.3.0"]
+# Local icon rendering when no system SVG rasterizer is installed.
+icon = ["Pillow>=9.0"]
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.1",
+    "Pillow>=9.0",
+    "tkinterdnd2>=0.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/AEdgecombe/markitdown-gui"
+Repository = "https://github.com/AEdgecombe/markitdown-gui"
+Issues = "https://github.com/AEdgecombe/markitdown-gui/issues"
+"Upstream engine" = "https://github.com/microsoft/markitdown"
+
+[project.scripts]
+markitdown-gui = "markitdown_gui.app:main"
+
+[tool.setuptools]
+packages = ["markitdown_gui"]
+
+[tool.setuptools.package-data]
+markitdown_gui = []
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# The Tk imports deliberately sit below the Tk-free conversion core so that
+# core can be imported headlessly; the late imports are intentional.
+"markitdown_gui/app.py" = ["E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
