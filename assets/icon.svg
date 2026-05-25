@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- MarkItDown GUI icon: a stylized "M" with a download arrow, dark theme. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#272d33"/>
+      <stop offset="1" stop-color="#1e2327"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded charcoal tile -->
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="url(#bg)"/>
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="none"
+        stroke="#3a434c" stroke-width="2"/>
+
+  <!-- Stylized "M" in accent blue -->
+  <path d="M 56 184 L 56 84 L 92 84 L 128 132 L 164 84 L 200 84 L 200 184 L 170 184 L 170 124 L 138 166 L 118 166 L 86 124 L 86 184 Z"
+        fill="#4a90d9"/>
+
+  <!-- Download arrow in success green, centered low -->
+  <g fill="#5cb85c">
+    <rect x="118" y="150" width="20" height="40" rx="4"/>
+    <path d="M 100 182 L 156 182 L 128 214 Z"/>
+  </g>
+</svg>
