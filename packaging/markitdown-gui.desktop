@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=MarkItDown
+GenericName=Document to Markdown Converter
+Comment=Convert documents (PDF, Word, PPTX, Excel, images, and more) to Markdown
+Exec=markitdown-gui
+Icon=markitdown-gui
+Terminal=false
+Categories=Utility;Office;
+Keywords=markdown;convert;document;pdf;word;office;
+StartupNotify=true
