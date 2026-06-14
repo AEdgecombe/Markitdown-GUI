@@ -55,7 +55,7 @@ markitdown-gui = "markitdown_gui.app:main"
 packages = ["markitdown_gui"]
 
 [tool.setuptools.package-data]
-markitdown_gui = []
+markitdown_gui = ["icon.png"]
 
 [tool.ruff]
 line-length = 100

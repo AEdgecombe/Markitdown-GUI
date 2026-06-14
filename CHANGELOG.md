@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- Modernised the UI: custom rounded buttons with hover states, a redesigned
+  drop zone with a download glyph and dashed border, a scrollable file queue
+  with per-file remove buttons, a slim progress bar during conversion, refined
+  dark palette, and improved typography.
+
+### Fixed
+- The window/taskbar icon now appears: the app sets `iconphoto` from a bundled
+  PNG, a matching `WM_CLASS`, and `StartupWMClass` in the `.desktop` entry so
+  GNOME/Ubuntu show the correct icon in the dock.
+
 ## [0.1.0] - 2026-06-14
 
 ### Added
