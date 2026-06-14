@@ -10,9 +10,7 @@ your files, pick an output folder, and get clean `.md` files.
 > `markitdown` CLI via subprocess. All conversion credit belongs to the
 > markitdown authors at Microsoft. See [NOTICE](NOTICE).
 
-![screenshot placeholder](docs/screenshot.png)
 
-<sub><i>Screenshot placeholder — drop a real screenshot at `docs/screenshot.png`.</i></sub>
 
 ## Features
 
