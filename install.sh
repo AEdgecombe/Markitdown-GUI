@@ -61,8 +61,14 @@ fi
 # 3. tkinterdnd2 (optional, non-fatal)
 # --------------------------------------------------------------------------- #
 say "Installing tkinterdnd2 (drag-and-drop support; optional)…"
-if python3 -m pip install --user tkinterdnd2 >/dev/null 2>&1; then
+if python3 -c 'import tkinterdnd2' >/dev/null 2>&1; then
+    ok "tkinterdnd2 already installed."
+elif python3 -m pip install --user tkinterdnd2 >/dev/null 2>&1; then
     ok "tkinterdnd2 installed."
+elif python3 -m pip install --user --break-system-packages tkinterdnd2 >/dev/null 2>&1; then
+    # Newer distros mark the Python as externally managed (PEP 668); installing
+    # into the user site with --break-system-packages is safe for a leaf package.
+    ok "tkinterdnd2 installed (externally-managed environment)."
 else
     warn "Could not install tkinterdnd2 — drag-and-drop will be disabled, the file picker still works."
 fi
