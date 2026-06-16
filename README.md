@@ -82,7 +82,7 @@ too: `pipx uninstall markitdown`.
 3. Click **Convert** and pick an output folder (defaults to `~/Documents`).
 4. Watch the log for per-file results. Each input `report.pdf` becomes `report.md`.
 
-The exact conversion call is `markitdown <input> -o <output>.md`.
+
 
 ## How it relates to upstream markitdown
 
