@@ -14,7 +14,7 @@ your files, pick an output folder, and get clean `.md` files.
 
 ## Features
 
-- **Drag & drop** files in (via `tkinterdnd2`) **or** a "Choose files…" picker — both work.
+- **Drag & drop** files in (via `tkinterdnd2`) **or** a "Choose files…" picker.
 - Graceful fallback: if drag-and-drop isn't available, the picker still works and
   the drop zone shows an "unavailable" message instead of crashing.
 - **Pick the output folder each run** (defaults to `~/Documents`).
