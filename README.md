@@ -11,7 +11,6 @@ your files, pick an output folder, and get clean `.md` files.
 > markitdown authors at Microsoft. See [NOTICE](NOTICE).
 
 
-
 ## Features
 
 - **Drag & drop** files in (via `tkinterdnd2`) **or** a "Choose files…" picker.
