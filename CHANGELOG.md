@@ -6,7 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- **Light and dark modes** with a header toggle. The choice persists to
+  `~/.config/markitdown-gui/config.json` and is restored on next launch.
+
 ### Changed
+- Softened the action buttons — the "Choose files…" and "Convert to Markdown"
+  buttons are now borderless (the fill/gradient carries the shape).
 - New **"Thermal Glow"** theme — an infrared-inspired palette (deep blue →
   electric purple → fiery pink → incandescent red/amber): gradient-glow primary
   button, a thermal gradient header seam, a recoloured drop zone and app icon,

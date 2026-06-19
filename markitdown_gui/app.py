@@ -18,42 +18,110 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # --------------------------------------------------------------------------- #
-# Theme — "Thermal Glow": an infrared heat map. Coldest is a deep blue-black;
-# heat rises through electric purple and fiery pink to incandescent red/amber.
+# Theme — "Thermal Glow": an infrared heat map. Heat rises through electric
+# purple and fiery pink to incandescent red/amber. Available in dark and light.
+#
+# Colours live in module globals so the canvas-drawn widgets can read them at
+# draw time; ``apply_theme()`` swaps the active palette and the UI is rebuilt.
 # --------------------------------------------------------------------------- #
-BG = "#0a0d1c"            # coldest — deep blue-black
-BG_GLOW = "#0e1430"       # faint warm-up near the header
-SURFACE = "#12183a"       # panels (deep indigo)
-SURFACE_2 = "#1b2350"     # raised surfaces (drop zone, chips)
-SURFACE_3 = "#2a3170"     # hover on raised surfaces
-FG = "#f4ecff"            # warm white
-FG_MUTED = "#a99fd6"      # lavender
-FG_FAINT = "#6a629e"      # tertiary text / icons
-BORDER = "#232b63"
-BORDER_STRONG = "#3a3f9e"
+DARK_PALETTE = {
+    "BG": "#0a0d1c",          # coldest — deep blue-black
+    "BG_GLOW": "#0e1430",
+    "SURFACE": "#12183a",     # panels (deep indigo)
+    "SURFACE_2": "#1b2350",   # raised surfaces (drop zone, chips)
+    "SURFACE_3": "#2a3170",   # hover on raised surfaces
+    "FG": "#f4ecff",          # warm white
+    "FG_MUTED": "#a99fd6",    # lavender
+    "FG_FAINT": "#6a629e",
+    "BORDER": "#232b63",
+    "BORDER_STRONG": "#3a3f9e",
+    "PURPLE": "#a14dff",
+    "PURPLE_HOT": "#bd6bff",
+    "PURPLE_DOWN": "#8a3de0",
+    "PINK": "#ff4d9d",
+    "PINK_HOT": "#ff70b6",
+    "RED": "#ff3b54",
+    "AMBER": "#ffb454",
+    "SUCCESS": "#ffb454",     # "hot" = finished
+    "ERROR": "#ff3b54",
+}
 
-PURPLE = "#a14dff"        # electric purple
-PURPLE_HOT = "#bd6bff"
-PURPLE_DOWN = "#8a3de0"
-PINK = "#ff4d9d"          # fiery pink
-PINK_HOT = "#ff70b6"
-RED = "#ff3b54"           # incandescent red
-AMBER = "#ffb454"         # hottest glow
+LIGHT_PALETTE = {
+    "BG": "#f5f2fb",          # soft warm lavender-white
+    "BG_GLOW": "#ece5f7",
+    "SURFACE": "#ffffff",     # cards
+    "SURFACE_2": "#f1ebfb",   # raised surfaces
+    "SURFACE_3": "#e6dcf6",   # hover
+    "FG": "#1c1533",          # dark purple-ink
+    "FG_MUTED": "#6a608f",
+    "FG_FAINT": "#a99fc6",
+    "BORDER": "#e7e0f3",
+    "BORDER_STRONG": "#d3c8ec",
+    "PURPLE": "#8b3ff0",
+    "PURPLE_HOT": "#9d5cff",
+    "PURPLE_DOWN": "#7430d0",
+    "PINK": "#ff3d92",
+    "PINK_HOT": "#ff5ca8",
+    "RED": "#e23048",
+    "AMBER": "#e88c0a",
+    "SUCCESS": "#c2620a",     # readable warm orange on light
+    "ERROR": "#dc2638",
+}
 
-# Semantic roles.
-ACCENT = PURPLE
-ACCENT_HOVER = PURPLE_HOT
-ACCENT_DOWN = PURPLE_DOWN
-SUCCESS = AMBER           # "hot" = finished
-ERROR = RED
+PALETTES = {"dark": DARK_PALETTE, "light": LIGHT_PALETTE}
+ACTIVE_THEME = "dark"
 
-# Backwards-compatible aliases (kept so existing imports keep working).
-BG_ALT = SURFACE
-BG_DROP = SURFACE_2
-SUCCESS_DIM = "#9a6a2e"
-BORDER_ = BORDER
+
+def apply_theme(name: str) -> None:
+    """Swap the active colour palette into module globals."""
+    global ACTIVE_THEME
+    ACTIVE_THEME = name if name in PALETTES else "dark"
+    g = globals()
+    g.update(PALETTES[ACTIVE_THEME])
+    # Derived aliases.
+    g["ACCENT"] = g["PURPLE"]
+    g["BG_ALT"] = g["SURFACE"]
+    g["BG_DROP"] = g["SURFACE_2"]
+
+
+# Declare the colour globals statically (values are filled by apply_theme()).
+BG = BG_GLOW = SURFACE = SURFACE_2 = SURFACE_3 = ""
+FG = FG_MUTED = FG_FAINT = BORDER = BORDER_STRONG = ""
+PURPLE = PURPLE_HOT = PURPLE_DOWN = PINK = PINK_HOT = RED = AMBER = ""
+SUCCESS = ERROR = ACCENT = BG_ALT = BG_DROP = ""
+
+# Populate the colour globals at import time (default: dark).
+apply_theme("dark")
 
 CONVERT_TIMEOUT = 600   # seconds, per file
+
+
+# --------------------------------------------------------------------------- #
+# Theme preference persistence (~/.config/markitdown-gui/config.json).
+# --------------------------------------------------------------------------- #
+def _config_path() -> Path:
+    base = os.environ.get("XDG_CONFIG_HOME") or str(Path.home() / ".config")
+    return Path(base) / "markitdown-gui" / "config.json"
+
+
+def load_theme_pref() -> str:
+    try:
+        import json
+        data = json.loads(_config_path().read_text())
+        name = data.get("theme", "dark")
+        return name if name in PALETTES else "dark"
+    except Exception:
+        return "dark"
+
+
+def save_theme_pref(name: str) -> None:
+    try:
+        import json
+        p = _config_path()
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps({"theme": name}))
+    except Exception:
+        pass
 
 
 # --------------------------------------------------------------------------- #
@@ -338,25 +406,30 @@ MSG_DONE = "done"
 
 
 class RoundedButton(tk.Canvas):
-    """A flat, modern rounded button. Primary buttons get a glowing gradient."""
+    """A flat, modern rounded button. Primary buttons get a glowing gradient.
 
-    _SOLID = {
-        "secondary": dict(fill=SURFACE_2, hover=SURFACE_3, down=SURFACE_2,
-                          text=FG, border=BORDER_STRONG),
-        "ghost": dict(fill="", hover=SURFACE_2, down=SURFACE_2,
-                      text=FG_MUTED, border=None),
-    }
-    # Primary: horizontal purple→pink gradient with a hotter hover.
-    _GRAD = {
-        "normal": [PURPLE, PINK],
-        "hover": [PURPLE_HOT, PINK_HOT],
-        "down": [PURPLE_DOWN, PINK],
-    }
+    Colours are looked up at draw time so a theme switch is picked up on redraw.
+    Borderless by design — fills and the gradient carry the shape, no outlines.
+    """
+
+    @staticmethod
+    def _solid_spec(variant):
+        return {
+            "secondary": dict(fill=SURFACE_2, hover=SURFACE_3, down=SURFACE_2,
+                              text=FG),
+            "ghost": dict(fill="", hover=SURFACE_2, down=SURFACE_2, text=FG_MUTED),
+        }[variant]
+
+    @staticmethod
+    def _grad_spec():
+        # Primary: horizontal purple→pink gradient with a hotter hover.
+        return {"normal": [PURPLE, PINK], "hover": [PURPLE_HOT, PINK_HOT],
+                "down": [PURPLE_DOWN, PINK]}
 
     def __init__(self, master, text, command=None, *, variant="primary",
-                 font=None, parent_bg=BG, padx=18, pady=11, radius=12, min_width=0):
+                 font=None, parent_bg=None, padx=18, pady=11, radius=12, min_width=0):
         self._variant = variant
-        self._parent_bg = parent_bg
+        self._parent_bg = parent_bg if parent_bg is not None else BG
         self._command = command
         self._text = text
         self._font = font or ("TkDefaultFont", 10)
@@ -381,33 +454,21 @@ class RoundedButton(tk.Canvas):
 
     def _draw(self, state):
         self.delete("all")
+        self.configure(bg=self._parent_bg)
         cw, ch, r = self._cw, self._ch, self._radius
         if not self._enabled:
-            if self._variant == "primary":
-                _round_rect(self, 1, 1, cw - 1, ch - 1, r, fill=SURFACE_2, outline="")
-            elif self._variant == "ghost":
-                _round_rect(self, 1, 1, cw - 1, ch - 1, r, fill=self._parent_bg,
-                            outline="")
-            else:
-                _round_rect(self, 1, 1, cw - 1, ch - 1, r, fill=SURFACE,
-                            outline=BORDER)
+            fill = self._parent_bg if self._variant == "ghost" else SURFACE_2
+            _round_rect(self, 0, 0, cw, ch, r, fill=fill, outline="")
             text_color = FG_FAINT
         elif self._variant == "primary":
-            _gradient_hrect(self, 1, 1, cw - 1, ch - 1, r, self._GRAD[state])
-            # subtle glow ring
-            _round_rect(self, 1, 1, cw - 1, ch - 1, r, fill="",
-                        outline=PINK_HOT if state != "normal" else PURPLE, width=1)
+            # Borderless gradient — the fill carries the shape, no outline.
+            _gradient_hrect(self, 0, 0, cw, ch, r, self._grad_spec()[state])
             text_color = "#ffffff"
         else:
-            spec = self._SOLID[self._variant]
+            spec = self._solid_spec(self._variant)
             fill = {"normal": spec["fill"], "hover": spec["hover"],
-                    "down": spec["down"]}[state]
-            if fill == "":
-                fill = self._parent_bg
-                _round_rect(self, 1, 1, cw - 1, ch - 1, r, fill=fill, outline="")
-            else:
-                _round_rect(self, 1, 1, cw - 1, ch - 1, r, fill=fill,
-                            outline=spec["border"] or "", width=1 if spec["border"] else 0)
+                    "down": spec["down"]}[state] or self._parent_bg
+            _round_rect(self, 0, 0, cw, ch, r, fill=fill, outline="")
             text_color = spec["text"]
         self._label = self.create_text(cw / 2, ch / 2, text=self._text,
                                        fill=text_color, font=self._font)
@@ -521,6 +582,10 @@ class App:
         self.selected_files: list[Path] = []
         self.queue: queue.Queue[tuple] = queue.Queue()
         self._worker: threading.Thread | None = None
+        self._log_entries: list[tuple[str, str]] = []
+
+        self.theme = load_theme_pref()
+        apply_theme(self.theme)
 
         self._init_fonts()
         self.root.title("MarkItDown")
@@ -581,6 +646,7 @@ class App:
     def _build_ui(self) -> None:
         outer = ttk.Frame(self.root, style="TFrame", padding=(24, 20, 24, 16))
         outer.pack(fill="both", expand=True)
+        self._outer = outer
 
         # Header: icon + title, with a thermal gradient seam beneath.
         header = ttk.Frame(outer, style="TFrame")
@@ -594,6 +660,13 @@ class App:
         ttk.Label(titles, text="MarkItDown", style="Title.TLabel").pack(anchor="w")
         ttk.Label(titles, text="Convert documents to clean Markdown",
                   style="Sub.TLabel").pack(anchor="w", pady=(1, 0))
+
+        # Light/dark toggle, top-right.
+        toggle_text = "☀  Light" if self.theme == "dark" else "☾  Dark"
+        self.theme_btn = RoundedButton(header, toggle_text, command=self._toggle_theme,
+                                       variant="secondary", font=self.f_btn,
+                                       parent_bg=BG, padx=14, pady=8)
+        self.theme_btn.pack(side="right", anchor="n")
 
         seam = tk.Canvas(outer, height=3, bg=BG, highlightthickness=0, bd=0)
         seam.pack(fill="x", pady=(14, 0))
@@ -859,11 +932,38 @@ class App:
     def _set_status(self, text: str) -> None:
         self.status_var.set(text)
 
-    def _log(self, text: str, tag: str = "info") -> None:
+    def _log(self, text: str, tag: str = "info", _record: bool = True) -> None:
+        if _record:
+            self._log_entries.append((text, tag))
         self.log.configure(state="normal")
         self.log.insert("end", text + "\n", tag)
         self.log.see("end")
         self.log.configure(state="disabled")
+
+    # -- theme switching --------------------------------------------------- #
+    def _toggle_theme(self) -> None:
+        self.theme = "light" if self.theme == "dark" else "dark"
+        apply_theme(self.theme)
+        save_theme_pref(self.theme)
+        self._rebuild()
+
+    def _rebuild(self) -> None:
+        """Tear down and rebuild the UI under the active theme, keeping state."""
+        status = self.status_var.get()
+        entries = list(self._log_entries)
+        busy = bool(self._worker and self._worker.is_alive())
+
+        self._outer.destroy()
+        self.root.configure(bg=BG)
+        self._build_styles()
+        self._build_ui()
+
+        for text, tag in entries:
+            self._log(text, tag, _record=False)
+        self._refresh_queue()
+        self.status_var.set(status)
+        if not self.executable or busy:
+            self.convert_btn.set_enabled(False)
 
 
 def main() -> None:
