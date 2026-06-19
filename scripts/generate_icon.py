@@ -21,12 +21,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SVG = ROOT / "assets" / "icon.svg"
 
-# Theme colours (kept in sync with assets/icon.svg and the app).
-BG_TOP = (39, 45, 51)
-BG_BOTTOM = (30, 35, 39)
-BORDER = (58, 67, 76)
-ACCENT = (74, 144, 217)
-SUCCESS = (92, 184, 92)
+# Theme colours — "Thermal Glow" (kept in sync with assets/icon.svg and the app).
+BG_TOP = (18, 24, 58)        # deep indigo
+BG_BOTTOM = (10, 13, 28)     # blue-black
+BORDER = (58, 63, 158)
+HEAT_L = (161, 77, 255)      # electric purple (M, left)
+HEAT_R = (255, 77, 157)      # fiery pink (M, right)
+ARROW_T = (255, 122, 61)     # arrow top (orange)
+ARROW_B = (255, 180, 84)     # arrow bottom (amber)
 
 
 def _run(cmd: list[str]) -> bool:
@@ -98,19 +100,40 @@ def render_with_pillow(out: Path, size: int) -> bool:
     def sc(points):
         return [(x * s, y * s) for x, y in points]
 
-    # Stylized "M".
+    def hgrad(c1, c2):
+        g = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        gd = ImageDraw.Draw(g)
+        for x in range(size):
+            t = x / max(size - 1, 1)
+            col = tuple(round(c1[i] + (c2[i] - c1[i]) * t) for i in range(3))
+            gd.line([(x, 0), (x, size)], fill=col + (255,))
+        return g
+
+    def vgrad(c1, c2):
+        g = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        gd = ImageDraw.Draw(g)
+        for y in range(size):
+            t = y / max(size - 1, 1)
+            col = tuple(round(c1[i] + (c2[i] - c1[i]) * t) for i in range(3))
+            gd.line([(0, y), (size, y)], fill=col + (255,))
+        return g
+
+    # Stylized "M" with a purple→pink heat gradient.
     m = [
         (56, 184), (56, 84), (92, 84), (128, 132), (164, 84), (200, 84),
         (200, 184), (170, 184), (170, 124), (138, 166), (118, 166),
         (86, 124), (86, 184),
     ]
-    draw.polygon(sc(m), fill=ACCENT + (255,))
+    m_mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(m_mask).polygon(sc(m), fill=255)
+    img.paste(hgrad(HEAT_L, HEAT_R), (0, 0), m_mask)
 
-    # Download arrow.
-    draw.rounded_rectangle(
-        [118 * s, 150 * s, 138 * s, 190 * s], radius=4 * s, fill=SUCCESS + (255,)
-    )
-    draw.polygon(sc([(100, 182), (156, 182), (128, 214)]), fill=SUCCESS + (255,))
+    # Download arrow with an incandescent amber gradient.
+    a_mask = Image.new("L", (size, size), 0)
+    am = ImageDraw.Draw(a_mask)
+    am.rounded_rectangle([118 * s, 150 * s, 138 * s, 190 * s], radius=4 * s, fill=255)
+    am.polygon(sc([(100, 182), (156, 182), (128, 214)]), fill=255)
+    img.paste(vgrad(ARROW_T, ARROW_B), (0, 0), a_mask)
 
     img.save(out, "PNG")
     return True

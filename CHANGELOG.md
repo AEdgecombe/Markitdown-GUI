@@ -7,6 +7,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Changed
+- New **"Thermal Glow"** theme — an infrared-inspired palette (deep blue →
+  electric purple → fiery pink → incandescent red/amber): gradient-glow primary
+  button, a thermal gradient header seam, a recoloured drop zone and app icon,
+  and heat-dot file chips. All gradients are drawn on the canvas (no image deps).
+- File and output-folder selection now use the **native GNOME/GTK chooser via
+  `zenity`** when available (a big upgrade over Tk's built-in dialog), falling
+  back to the Tk dialog otherwise.
+
+### Changed (earlier)
 - Modernised the UI: custom rounded buttons with hover states, a redesigned
   drop zone with a download glyph and dashed border, a scrollable file queue
   with per-file remove buttons, a slim progress bar during conversion, refined
