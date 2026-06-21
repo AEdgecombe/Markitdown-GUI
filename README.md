@@ -1,4 +1,4 @@
-# MarkItDown GUI
+# MarkItDown GUI for Ubuntu 
 
 A simple, native-feeling **Ubuntu/GNOME desktop app** for converting documents to
 Markdown. It is a thin graphical front-end for Microsoft's excellent
