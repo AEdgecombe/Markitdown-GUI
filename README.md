@@ -3,7 +3,7 @@
 A simple, native-feeling **Ubuntu/GNOME desktop app** for converting documents to
 Markdown. It is a thin graphical front-end for Microsoft's excellent
 [`markitdown`](https://github.com/microsoft/markitdown) command-line tool — drag in
-your files, pick an output folder, and get clean `.md` files.
+your files, pick an output folder and get clean `.md` files.
 
 > **Relationship to upstream:** this is a *standalone* project. It does **not**
 > fork or modify `markitdown`; it installs it as a dependency and calls the
