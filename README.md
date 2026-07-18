@@ -9,7 +9,7 @@ your files, pick an output folder and get clean `.md` files.
 > fork or modify `markitdown`; it installs it as a dependency and calls the
 > `markitdown` CLI by subprocess. All conversion credit belongs to the
 > markitdown authors at Microsoft. See [NOTICE](NOTICE).
-
+ 
  
 ## Features
 
